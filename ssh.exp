@@ -1,0 +1,17 @@
+#! /usr/local/bin/expect -f
+
+# Auto input password to ssh
+# Useage:
+# ssh.exp ip port username password
+
+set ip [lindex $argv 0]
+set port [lindex $argv 1]
+set user [lindex $argv 2]
+set password [lindex $argv 3]
+set timeout 10
+spawn ssh $user@$ip -p $port
+expect {
+    "*yes/no" { send "yes\r"; exp_continue}
+    "*password:" { send "$password\r" }
+}
+interact
