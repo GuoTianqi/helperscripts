@@ -1,0 +1,37 @@
+# 用法
+# mount_smbfs_cp from_本地文件 to共享目录(mount_smbfs格式) to目标文件(可不填）
+mount_smbfs_cp() {
+    if [ '$0' = 'mount_smbfs_cp' ];then
+        if [ $# < 2 ];then
+            echo "参数错误"
+            echo "用法"
+            echo "mount_smbfs_cp  from_本地文件 to共享目录(mount_smbfs格式) to目标文件(可不填）"
+            return
+        fi
+    fi
+
+
+    mountDir=TempDir
+    mountedStateFile=mounted.state # mountDir是否已经mount的标志
+
+    if [ ! -d $mountDir ];then
+        mkdir $mountDir
+    else
+        if [ -f $mountedStateFile ];then
+            umount $mountDir
+            rm $mountedStateFile
+        fi
+    fi
+
+    mount_smbfs $2 $mountDir
+    touch $mountedStateFile # 创建文件用于标记已经mount
+
+    if [ $# > 2 ];then
+        cp $1 $mountDir/$3
+    else
+        cp $1 $mountDir
+    fi
+    umount $mountDir
+    rm $mountedStateFile # 删除mount标记
+    rm -rf $mountDir
+}
